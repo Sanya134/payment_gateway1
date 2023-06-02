@@ -1,0 +1,85 @@
+{% load static %}
+<html>
+<head>
+    <title>Shopping Page</title>
+    <style>
+        /* CSS styles for the navigation bar */
+        .navbar {
+            background-color: #f8f8f8;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .navbar h1 {
+            margin: 0;
+        }
+
+        /* CSS styles for the card */
+        .card {
+            display: inline-block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .card img {
+          height: 100px;
+          width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Shopping</h1>
+    </div>
+
+    <div class="card">
+        <img src="{% static 'cloth.jpg' %}" alt="Cloth Image">
+        <div class="card-body">
+            <form id="payment-form">
+                {% csrf_token %}
+                <button id="pay-with-khalti">Pay with Khalti</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- <form id="payment-form">
+      {% csrf_token %}
+      <button id="pay-with-khalti">Pay with Khalti</button>
+  </form> -->
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+  function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      }
+    }
+  });
+
+  $("#payment-form").on('submit', function(e){
+    e.preventDefault();
+    $.post("/initiate-payment/", function(data, status){
+        console.log("Inside success callback");
+        console.log(data);
+        window.location.href = data.payment_url;
+    }).fail(function(error) {
+        console.log("Error: ", error);
+    });
+  });
+});
+</script>
+</body>
+</html>
